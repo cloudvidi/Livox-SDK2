@@ -41,7 +41,7 @@ target_compile_options(
   PRIVATE $<$<CXX_COMPILER_ID:Clang>:-Wno-unknown-pragmas -Wall -Werror
   -Wno-c++11-long-long>)
 
-set(LIVOX_PRIVATE_3RDPARTY_INCLUDE_DIR ../3rdparty ../3rdparty/spdlog)
+set(LIVOX_PRIVATE_THIRDPARTY_INCLUDE_DIR ../3rdparty ../3rdparty/spdlog)
 set(LIVOX_PRIVATE_INCLUDE_DIR .)
 set(LIVOX_PUBLIC_INCLUDE_DIR ../include)
 
@@ -49,12 +49,12 @@ target_include_directories(
   ${SDK_LIBRARY_STATIC}
   PUBLIC ${LIVOX_PUBLIC_INCLUDE_DIR}
   PRIVATE ${LIVOX_PRIVATE_INCLUDE_DIR}
-  SYSTEM PRIVATE ${LIVOX_PRIVATE_3RDPARTY_INCLUDE_DIR})
+  SYSTEM PRIVATE ${LIVOX_PRIVATE_THIRDPARTY_INCLUDE_DIR})
 target_include_directories(
   ${SDK_LIBRARY_SHARED}
   PUBLIC ${LIVOX_PUBLIC_INCLUDE_DIR}
   PRIVATE ${LIVOX_PRIVATE_INCLUDE_DIR}
-  SYSTEM PRIVATE ${LIVOX_PRIVATE_3RDPARTY_INCLUDE_DIR})
+  SYSTEM PRIVATE ${LIVOX_PRIVATE_THIRDPARTY_INCLUDE_DIR})
 
 set(MAIN_SOURCES device_manager.cpp livox_lidar_sdk.cpp params_check.cpp
   parse_cfg_file.cpp upgrade_manager.cpp)
