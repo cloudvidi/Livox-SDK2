@@ -43,16 +43,19 @@ target_compile_options(
 
 set(LIVOX_PRIVATE_THIRDPARTY_INCLUDE_DIR ../3rdparty ../3rdparty/spdlog)
 set(LIVOX_PRIVATE_INCLUDE_DIR .)
-set(LIVOX_PUBLIC_INCLUDE_DIR ../include)
 
 target_include_directories(
   ${SDK_LIBRARY_STATIC}
-  PUBLIC ${LIVOX_PUBLIC_INCLUDE_DIR}
+  PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
+  $<INSTALL_INTERFACE:include>
   PRIVATE ${LIVOX_PRIVATE_INCLUDE_DIR}
   SYSTEM PRIVATE ${LIVOX_PRIVATE_THIRDPARTY_INCLUDE_DIR})
 target_include_directories(
   ${SDK_LIBRARY_SHARED}
-  PUBLIC ${LIVOX_PUBLIC_INCLUDE_DIR}
+  PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
+  $<INSTALL_INTERFACE:include>
   PRIVATE ${LIVOX_PRIVATE_INCLUDE_DIR}
   SYSTEM PRIVATE ${LIVOX_PRIVATE_THIRDPARTY_INCLUDE_DIR})
 
@@ -106,8 +109,49 @@ target_sources(${SDK_LIBRARY_SHARED} PRIVATE ${LIVOX_SOURCES})
 target_link_libraries(${SDK_LIBRARY_STATIC} PUBLIC Threads::Threads)
 target_link_libraries(${SDK_LIBRARY_SHARED} PUBLIC Threads::Threads)
 
+# Create alias targets for consistency
+add_library(livox_sdk2::static ALIAS ${SDK_LIBRARY_STATIC})
+add_library(livox_sdk2::shared ALIAS ${SDK_LIBRARY_SHARED})
+
+# Install targets with export
 install(
   TARGETS ${SDK_LIBRARY_STATIC} ${SDK_LIBRARY_SHARED}
+  EXPORT livox_sdk2Targets
   PUBLIC_HEADER DESTINATION include
   ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib)
+  LIBRARY DESTINATION lib
+)
+
+# Install CMake config files
+include(CMakePackageConfigHelpers)
+
+# Generate package config file
+configure_package_config_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/../cmake/livox_sdk2Config.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/livox_sdk2Config.cmake
+  INSTALL_DESTINATION lib/cmake/livox_sdk2
+)
+
+# Generate version file
+write_basic_package_version_file(
+  ${CMAKE_CURRENT_BINARY_DIR}/livox_sdk2ConfigVersion.cmake
+  VERSION ${LIVOX_SDK_VERSION_STRING}
+  COMPATIBILITY SameMajorVersion
+)
+
+# Install export targets
+install(
+  EXPORT livox_sdk2Targets
+  FILE livox_sdk2Targets.cmake
+  NAMESPACE livox_sdk2::
+  DESTINATION lib/cmake/livox_sdk2
+)
+
+# Install config files
+install(
+  FILES
+  ${CMAKE_CURRENT_BINARY_DIR}/livox_sdk2Config.cmake
+  ${CMAKE_CURRENT_BINARY_DIR}/livox_sdk2ConfigVersion.cmake
+  DESTINATION lib/cmake/livox_sdk2
+)
+
